@@ -5,7 +5,8 @@ IF NOT EXISTS (
  FROM sys.databases
  WHERE name = N'InstagramDB'
 )
- CREATE DATABASE [InstagramDB];
+
+CREATE DATABASE [InstagramDB];
 GO
 IF SERVERPROPERTY('ProductVersion') > '12'
  ALTER DATABASE [InstagramDB] SET QUERY_STORE=ON;
@@ -63,3 +64,7 @@ END
 EXECUTE save_data
     @Username = "mojtaba.hashemip",
     @Password = "m.h4400255761"
+
+
+-------------------------------
+DELETE FROM [dbo].[UserInfo]
